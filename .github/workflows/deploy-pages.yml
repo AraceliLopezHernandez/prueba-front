@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Publica solo cuando hay cambios integrados en la rama productiva.
+  push:
+    branches:
+      - main
+
+# Permisos minimos para leer el repo y publicar en GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita despliegues simultaneos sobre el mismo sitio.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy static site
+    runs-on: ubuntu-latest
+    environment:
+      # Usa el environment productivo para el deploy final.
+      name: production
+
+    steps:
+      # Descarga el contenido actual de la rama main.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Empaqueta el sitio estatico para entregarlo a GitHub Pages.
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      # Publica el artefacto generado en GitHub Pages.
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
