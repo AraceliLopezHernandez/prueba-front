@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  # Ejecuta validaciones cuando se abren o actualizan PR hacia ramas clave.
+  pull_request:
+    branches:
+      - dev
+      - qa
+      - main
+  # Ejecuta las mismas validaciones en pushes directos a las ramas clave.
+  push:
+    branches:
+      - dev
+      - qa
+      - main
+
+jobs:
+  validate-html:
+    name: Validate HTML
+    runs-on: ubuntu-latest
+
+    steps:
+      # Descarga el contenido del repositorio para poder inspeccionarlo.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Falla si el archivo principal del sitio no existe.
+      - name: Validate index.html exists
+        run: test -f index.html
+
+      # Revisa una estructura minima del HTML sin instalar herramientas extra.
+      - name: Check basic HTML structure
+        run: |
+          grep -q "<!DOCTYPE html>" index.html
+          grep -q "<html" index.html
+          grep -q "<head>" index.html
+          grep -q "<body>" index.html
+          grep -q "</html>" index.html
